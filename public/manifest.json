@@ -1,0 +1,27 @@
+{
+  "name": "伴你左右",
+  "short_name": "伴你左右",
+  "description": "AI 驱动的数字人生活助手 - 语音对话、待办提醒、情感陪伴",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf2e7",
+  "theme_color": "#b45309",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": []
+}
