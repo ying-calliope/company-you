@@ -1730,7 +1730,15 @@ function confirmScheduleDraft() {
       );
       if (startAt === null) return null;
 
-      const endAt = resolveCourseEndAt(item, now) ?? undefined;
+      const endAt = resolveCourseEndAt(
+        {
+         date: item.date,
+         weekday: item.weekday,
+         startTime: item.startTime,
+         endTime: item.endTime,
+        },
+          now
+      ) ?? undefined;
       return {
         id: nowId("c"),
         title: item.title,
