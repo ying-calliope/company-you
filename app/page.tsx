@@ -373,7 +373,7 @@ function weekdayFromTimestamp(ts: number) {
 }
 
 function resolveCourseClockAt(
-  item: { date: string; weekday: number },
+  item: { date?: string; weekday: number },
   clock: string,
   nowMs = Date.now(),
 ) {
@@ -398,14 +398,14 @@ function resolveCourseClockAt(
 }
 
 function resolveCourseStartAt(
-  item: { date: string; weekday: number; startTime: string },
+  item: { date?: string; weekday: number; startTime: string },
   nowMs = Date.now(),
 ) {
   return resolveCourseClockAt(item, item.startTime, nowMs);
 }
 
 function resolveCourseEndAt(
-  item: { date: string; weekday: number; startTime: string; endTime?: string },
+  item: { date?: string; weekday: number; startTime: string; endTime?: string },
   nowMs = Date.now(),
 ) {
   if (!item.endTime || !/^\d{1,2}:\d{2}$/.test(item.endTime)) return null;

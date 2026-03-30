@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,8 +16,6 @@ export const metadata: Metadata = {
   title: "伴你左右",
   description: "AI 驱动的数字人生活助手 - 语音对话、情感陪伴、待办提醒",
   manifest: "/manifest.json",
-  themeColor: "#b45309",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -26,6 +24,13 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#b45309",
 };
 
 export default function RootLayout({
