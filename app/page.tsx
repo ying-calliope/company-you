@@ -1725,6 +1725,10 @@ function confirmScheduleDraft() {
     ...(item.date ? { date: item.date } : {}),
     weekday: item.weekday,
     startTime: item.startTime,
+  } as {
+    date: string;
+    weekday: number;
+    startTime: string;
   },
   now
 );
@@ -1737,6 +1741,11 @@ const endAt =
       weekday: item.weekday,
       startTime: item.startTime,
       ...(item.endTime ? { endTime: item.endTime } : {}),
+    } as {
+      date: string;
+      weekday: number;
+      startTime: string;
+      endTime?: string;
     },
     now
   ) ?? undefined;
