@@ -1708,95 +1708,63 @@ export default function Home() {
     }
   }
 
-function confirmScheduleDraft() {
-  if (!scheduleDraft) return;
-  const now = Date.now();
-  const parsedCourses: CourseItem[] = scheduleDraft.courses
-    .map((item) => {
-      // 确保 item.date 存在，否则跳过该课程
-      if (!item.date) {
-        console.warn('课程缺少日期，已跳过', item);
-        return null;
-      }
+  function confirmScheduleDraft() {
+    if (!scheduleDraft) return;
+    const now = Date.now();
+    const parsedCourses: CourseItem[] = scheduleDraft.courses
+      .map((item) => {
+        const startAt = resolveCourseStartAt(item, now);
+        if (startAt === null) return null;
+        const endAt = resolveCourseEndAt(item, now) ?? undefined;
+        return {
+          id: nowId("c"),
+          title: item.title,
+          classroom: item.classroom || "待确认教室",
+          startAt,
+          endAt,
+          reminded: false,
+          done: false,
+        } as CourseItem;
+      })
+      .filter((item): item is CourseItem => Boolean(item))
+      .sort((a, b) => a.startAt - b.startAt);
 
-      // 显式构造符合 resolveCourseStartAt 参数类型的对象
-     const startAt = resolveCourseStartAt(
-  {
-    ...(item.date ? { date: item.date } : {}),
-    weekday: item.weekday,
-    startTime: item.startTime,
-  } as {
-    date: string;
-    weekday: number;
-    startTime: string;
-  },
-  now
-);
-if (startAt === null) return null;
+    const upcomingCourses = parsedCourses
+      .map((item) => {
+        const rolledStart = toUpcomingWeeklyTimestamp(item.startAt, now);
+        if (rolledStart === null) return null;
+        return {
+          ...item,
+          startAt: rolledStart,
+          reminded: false,
+        } as CourseItem;
+      })
+      .filter((item): item is CourseItem => Boolean(item))
+      .sort((a, b) => a.startAt - b.startAt);
+    const rolledCount = parsedCourses.filter((item) => item.startAt <= now).length;
 
-const endAt =
-  resolveCourseEndAt(
-    {
-      ...(item.date ? { date: item.date } : {}),
-      weekday: item.weekday,
-      startTime: item.startTime,
-      ...(item.endTime ? { endTime: item.endTime } : {}),
-    } as {
-      date: string;
-      weekday: number;
-      startTime: string;
-      endTime?: string;
-    },
-    now
-  ) ?? undefined;
+    if (upcomingCourses.length === 0) {
+      setToast({
+        title: "录入失败",
+        body: rolledCount > 0
+          ? "课表草稿中的课程时间无法解析，当前没有可用课程。"
+          : "课表草稿里没有可用的时间信息，请重新上传截图。",
+        actions: [{ label: "知道了", kind: "dismiss", variant: "primary" }],
+      });
+      return;
+    }
 
-return {
-  id: nowId("c"),
-  title: item.title,
-  classroom: item.classroom || "待确认教室",
-  startAt,
-  endAt,
-  reminded: false,
-  done: false,
-} as CourseItem;
-}).filter((item): item is CourseItem => Boolean(item)).sort((a, b) => a.startAt - b.startAt);
-
-  const upcomingCourses = parsedCourses
-    .map((item) => {
-      const rolledStart = toUpcomingWeeklyTimestamp(item.startAt, now);
-      if (rolledStart === null) return null;
-      return {
-        ...item,
-        startAt: rolledStart,
-        reminded: false,
-      } as CourseItem;
-    })
-    .filter((item): item is CourseItem => Boolean(item))
-    .sort((a, b) => a.startAt - b.startAt);
-  const rolledCount = parsedCourses.filter((item) => item.startAt <= now).length;
-
-  if (upcomingCourses.length === 0) {
+    setCourses(upcomingCourses);
+    setNextCourseOverride(null);
+    setScheduleDraft(null);
     setToast({
-      title: "录入失败",
+      title: "课表已录入",
       body: rolledCount > 0
-        ? "课表草稿中的课程时间无法解析，当前没有可用课程。"
-        : "课表草稿里没有可用的时间信息，请重新上传截图。",
+        ? `已录入 ${upcomingCourses.length} 门课程，并开启课前 15 分钟提醒。已将 ${rolledCount} 门已过时间课程顺延到下周。`
+        : `已录入 ${upcomingCourses.length} 门课程，并开启课前 15 分钟提醒。`,
       actions: [{ label: "知道了", kind: "dismiss", variant: "primary" }],
     });
-    return;
   }
-
-  setCourses(upcomingCourses);
-  setNextCourseOverride(null);
-  setScheduleDraft(null);
-  setToast({
-    title: "课表已录入",
-    body: rolledCount > 0
-      ? `已录入 ${upcomingCourses.length} 门课程，并开启课前 15 分钟提醒。已将 ${rolledCount} 门已过时间课程顺延到下周。`
-      : `已录入 ${upcomingCourses.length} 门课程，并开启课前 15 分钟提醒。`,
-    actions: [{ label: "知道了", kind: "dismiss", variant: "primary" }],
-  });
-}
 
   function confirmNoticeDraft() {
     if (!noticeDraft) return;
