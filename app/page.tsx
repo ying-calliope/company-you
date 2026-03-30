@@ -1708,26 +1708,42 @@ export default function Home() {
     }
   }
 
-  function confirmScheduleDraft() {
-    if (!scheduleDraft) return;
-    const now = Date.now();
-    const parsedCourses: CourseItem[] = scheduleDraft.courses
-      .map((item) => {
-        const startAt = resolveCourseStartAt(item, now);
-        if (startAt === null) return null;
-        const endAt = resolveCourseEndAt(item, now) ?? undefined;
-        return {
-          id: nowId("c"),
-          title: item.title,
-          classroom: item.classroom || "待确认教室",
-          startAt,
-          endAt,
-          reminded: false,
-          done: false,
-        } as CourseItem;
-      })
-      .filter((item): item is CourseItem => Boolean(item))
-      .sort((a, b) => a.startAt - b.startAt);
+ function confirmScheduleDraft() {
+  if (!scheduleDraft) return;
+  const now = Date.now();
+  const parsedCourses: CourseItem[] = scheduleDraft.courses
+    .map((item) => {
+      // 如果 item.date 缺失，则跳过该课程（或根据业务逻辑处理）
+      if (!item.date) {
+        console.warn('课程缺少日期，已跳过', item);
+        return null;
+      }
+
+      // 显式构造 resolveCourseStartAt 所需的对象，确保类型匹配
+      const startAt = resolveCourseStartAt(
+        {
+          date: item.date,
+          weekday: item.weekday,     // 假设 item 中有 weekday 字段，如果没有需要补充
+          startTime: item.startTime,
+        },
+        now
+      );
+      if (startAt === null) return null;
+
+      const endAt = resolveCourseEndAt(item, now) ?? undefined;
+      return {
+        id: nowId("c"),
+        title: item.title,
+        classroom: item.classroom || "待确认教室",
+        startAt,
+        endAt,
+        reminded: false,
+        done: false,
+      } as CourseItem;
+    })
+    .filter((item): item is CourseItem => Boolean(item))
+    .sort((a, b) => a.startAt - b.startAt);
+}
 
     const upcomingCourses = parsedCourses
       .map((item) => {
