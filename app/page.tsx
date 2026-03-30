@@ -1720,37 +1720,37 @@ function confirmScheduleDraft() {
       }
 
       // 显式构造符合 resolveCourseStartAt 参数类型的对象
-      const startAt = resolveCourseStartAt(
-        {
-          date: item.date,
-          weekday: item.weekday,
-          startTime: item.startTime,
-        },
-        now
-      );
-      if (startAt === null) return null;
+     const startAt = resolveCourseStartAt(
+  {
+    ...(item.date ? { date: item.date } : {}),
+    weekday: item.weekday,
+    startTime: item.startTime,
+  },
+  now
+);
+if (startAt === null) return null;
 
-      const endAt = resolveCourseEndAt(
-        {
-         date: item.date,
-         weekday: item.weekday,
-         startTime: item.startTime,
-         endTime: item.endTime,
-        },
-          now
-      ) ?? undefined;
-      return {
-        id: nowId("c"),
-        title: item.title,
-        classroom: item.classroom || "待确认教室",
-        startAt,
-        endAt,
-        reminded: false,
-        done: false,
-      } as CourseItem;
-    })
-    .filter((item): item is CourseItem => Boolean(item))
-    .sort((a, b) => a.startAt - b.startAt);
+const endAt =
+  resolveCourseEndAt(
+    {
+      ...(item.date ? { date: item.date } : {}),
+      weekday: item.weekday,
+      startTime: item.startTime,
+      ...(item.endTime ? { endTime: item.endTime } : {}),
+    },
+    now
+  ) ?? undefined;
+
+return {
+  id: nowId("c"),
+  title: item.title,
+  classroom: item.classroom || "待确认教室",
+  startAt,
+  endAt,
+  reminded: false,
+  done: false,
+} as CourseItem;
+}).filter((item): item is CourseItem => Boolean(item)).sort((a, b) => a.startAt - b.startAt);
 
   const upcomingCourses = parsedCourses
     .map((item) => {
