@@ -1708,22 +1708,23 @@ export default function Home() {
     }
   }
 
- function confirmScheduleDraft() {
+function confirmScheduleDraft() {
   if (!scheduleDraft) return;
   const now = Date.now();
   const parsedCourses: CourseItem[] = scheduleDraft.courses
     .map((item) => {
-      // 如果 item.date 缺失，则跳过该课程（或根据业务逻辑处理）
+      // 1. 确保 item.date 存在，否则跳过该课程
       if (!item.date) {
         console.warn('课程缺少日期，已跳过', item);
         return null;
       }
 
-      // 显式构造 resolveCourseStartAt 所需的对象，确保类型匹配
+      // 2. 显式构造符合 resolveCourseStartAt 参数类型的对象
+      //    如果 item 中已有 weekday，直接使用；否则可根据 date 计算
       const startAt = resolveCourseStartAt(
         {
-          date: item.date,
-          weekday: item.weekday,     // 假设 item 中有 weekday 字段，如果没有需要补充
+          date: item.date,        // 现在 item.date 一定是 string
+          weekday: item.weekday,  // 确保 item 中有 weekday 字段
           startTime: item.startTime,
         },
         now
